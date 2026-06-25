@@ -16,9 +16,7 @@ def get_files_info(working_directory: str, directory: str = ".") -> str:
         if not os.path.isdir(full_directory): 
             return f'Error: "{directory}" is not a directory'
 
-        list_directory = os.listdir(full_directory)
-        #for item in list_directory:
-        #    answer += f"- {item}: file_size={os.path.getsize(f"{full_directory}/{item}")} bytes, is_dir={bool(os.path.isdir(f"{full_directory}/{item}"))}\n"
+        list_directory = os.listdir(full_directory) # here we are taking input from outter source it's doese'nt satfsife the FP rules
         return "\n".join(map(lambda file : organizer(full_directory, file), list_directory))
     except Exception as e:
         return f'Error: {e}'
