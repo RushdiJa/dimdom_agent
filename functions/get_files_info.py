@@ -1,20 +1,25 @@
-import os 
+import os
+from functions.utilities.paths import is_safe_path
+def organizer(full_directory: str, file: str) -> str:
+    merged_path: str = os.path.join(full_directory, file)
+    size_in_bytes: int = os.path.getsize(merged_path)
+    is_dir: bool = bool(os.path.isdir(merged_path))
+    return f"-{file}: file_size= {size_in_bytes} bytes, is_dir={is_dir}"
+
 def get_files_info(working_directory: str, directory: str = ".") -> str:
-    """
-        working_directory: the base start search from 
-        directory: the directory we LLM want 
-    """
     try:
-        if not os.path.isdir(directory):
+        if not is_safe_path(working_directory, directory):
+            return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
+        
+        full_directory = os.path.join(working_directory, directory)
+        
+        if not os.path.isdir(full_directory): 
             return f'Error: "{directory}" is not a directory'
 
-        working_dir_abs : str = os.path.abspath(working_directory)
-        target_dir : str = os.path.normpath( os.path.join(working_dir_abs, directory))
-        valid_target_dir : bool = os.path.commonpath([working_dir_abs, target_dir]) == working_dir_abs
-    
-        if not valid_target_dir:
-            return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
-
-        return f'Success: "{directory}" is within the working directory'
+        list_directory = os.listdir(full_directory)
+        #for item in list_directory:
+        #    answer += f"- {item}: file_size={os.path.getsize(f"{full_directory}/{item}")} bytes, is_dir={bool(os.path.isdir(f"{full_directory}/{item}"))}\n"
+        return "\n".join(map(lambda file : organizer(full_directory, file), list_directory))
     except Exception as e:
         return f'Error: {e}'
+
