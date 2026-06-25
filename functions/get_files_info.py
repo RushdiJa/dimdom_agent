@@ -1,5 +1,7 @@
 import os
 from functions.utilities.paths import is_safe_path
+from google.genai import types
+
 def organizer(full_directory: str, file: str) -> str:
     merged_path: str = os.path.join(full_directory, file)
     size_in_bytes: int = os.path.getsize(merged_path)
@@ -20,4 +22,18 @@ def get_files_info(working_directory: str, directory: str = ".") -> str:
         return "\n".join(map(lambda file : organizer(full_directory, file), list_directory))
     except Exception as e:
         return f'Error: {e}'
+
+schema_get_files_info = types.FunctionDeclaration(
+    name="get_files_info",
+    description="Lists files in a specified directory relative to the working directory, providing file size and directory status",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="Directory path to list files from, relative to the working directory (default is the working directory itself)",
+            ),
+        },
+    ),
+)
 

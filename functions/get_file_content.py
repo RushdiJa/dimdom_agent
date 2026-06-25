@@ -1,7 +1,7 @@
 import os 
 # from utilities.paths import is_safe_path
 from functions.utilities.paths import is_safe_path
-
+from google.genai import types
 def get_file_content(working_directory: str, file_path: str) -> str:
     try:
         MAX_CHARS = 10000 # const 
@@ -18,3 +18,19 @@ def get_file_content(working_directory: str, file_path: str) -> str:
         return content
     except Exception as E:
         return f"Error: {E}"
+
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="Gives you the file content at the directory you gave him",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="a path to the file you need it's content, relative to the working directory (default is the working directory itself)",
+            ),
+        },
+        required=["file_path"]
+    ),
+)
+

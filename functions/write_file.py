@@ -1,6 +1,6 @@
 import os 
 from functions.utilities.paths import is_safe_path
-
+from google.genai import types
 def write_file(working_directory: str, file_path: str, content: str) -> str:
     try:
         if not is_safe_path(working_directory, file_path):
@@ -22,3 +22,23 @@ def write_file(working_directory: str, file_path: str, content: str) -> str:
         return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
     except Exception as E:
         return f"Error: {E}"
+
+schema_write_file = types.FunctionDeclaration(
+    name="write_file",
+    description="create and write the content in the file_path",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING, 
+                description="a path to the file to run be sure it's, relative to the working directory (default is the working directory itself)",
+            ),
+            "content": types.Schema(
+                type = types.Type.STRING,
+                description="The content you want to put in the file",      
+            ),
+        },
+        required=["file_path", "content"]
+    ),
+)
+
