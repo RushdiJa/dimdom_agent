@@ -131,7 +131,7 @@ def main():
                         or (function_call_result.parts[0].function_response.response is None)): raise Exception("function_calls_result")
                 if args.verbose: 
                     print(f"-> {function_call_result.parts[0].function_response.response}")
-                    list_functions_result.append(function_call_result.parts[0])
+                list_functions_result.append(function_call_result.parts[0])
                 for fun in list_functions_result:
                     try:
                         messages.append(types.Content(role="function",
