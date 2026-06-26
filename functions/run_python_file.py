@@ -9,7 +9,7 @@ def run_python_file(working_directory: str, file_path: str, args: list[str] | No
         full_path = os.path.normpath(os.path.join(working_directory, file_path))
         if not os.path.isfile(full_path):
             return f'Error: "{file_path}" does not exist or is not a regular file'
-        if len(full_path) < 3 or full_path.endswith(".py"):
+        if not full_path.endswith(".py"):
             return f'Error: "{file_path}" is not a Python file'
         # abc.py 2 
         command = ["python", full_path]
