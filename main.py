@@ -59,7 +59,7 @@ if api_key == None:
 client = genai.Client(api_key = api_key)
 
 messages: list[types.Content] = []
-with open("memory.txt", "r+") as file:
+with open("memory.txt", "r") as file:
     content = file.read()
     list_memory_msg = content.split("\n")
     for msg in list_memory_msg:
@@ -74,7 +74,7 @@ messages.append(
     types.Content(role="user", parts=[types.Part(text=args.user_prompt)])
 )
 
-def call_dimdom():
+def call_dimdom(use_tools : bool = True):
     global client
     global api_key_num
     global api_key
@@ -84,17 +84,20 @@ def call_dimdom():
         try:
             response = client.models.generate_content(
                 model="gemini-2.5-flash",
-                contents=messages,
-                config=types.GenerateContentConfig(tools=[available_functions], system_instruction=system_prompt, temperature = 0)        
+                contents=messages, 
+                config = types.GenerateContentConfig(
+                    tools=[available_functions] if use_tools else [],
+                    system_instruction=system_prompt,
+                    temperature=0
+                )
             )
             if response.usage_metadata is None: raise ConnectionError("meta data is null")
-            y = response.usage_metadata.prompt_token_count # if meta_data is null
-            return response 
+            # if meta_data is null
+            return response or None 
         except Exception as error:
             if args.verbose:
                 print(f"Api Key {api_key_num} failed")
-                print(f"Error_messge: {error}")
-            error_message = str(error)        
+                print(f"Error_messge: {error}")         
             api_key_num = (api_key_num) % (TOTAL_API_KEYS) + 1 
             api_key = os.environ.get(f"GEMINI_API_KEY{api_key_num}")
             
@@ -184,7 +187,7 @@ def main():
             - Do NOT add any explanation, preamble, or formatting
             """
 
-            new_optmized_memory = call_dimdom().text
+            new_optmized_memory = call_dimdom(False).text
 
             if new_optmized_memory:
                 os.remove("memory.txt")
