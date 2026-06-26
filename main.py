@@ -39,11 +39,12 @@ Some messages may be prefixed with "Memory: " — these are past messages from t
 - Treat Memory messages as facts the user already told you in a previous conversation.
 """ 
 
+load_dotenv()
 
 
-api_key_num = 5
+api_key_num = 1 
 TOTAL_API_KEYS = int(os.environ.get("TOTAL_API_KEYS") or 1)
-MAX_ITERATIONS = 20 
+MAX_ITERATIONS = 5 
 
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
@@ -51,7 +52,7 @@ parser.add_argument("--verbose", action="store_true", help="Enable verbose outpu
 args = parser.parse_args()
 
 
-api_key = os.environ.get("GEMINI_API_KEY1")
+api_key = os.environ.get(f"GEMINI_API_KEY{api_key_num}")
 if api_key == None: 
     raise EnvironmentError("Api key 1 not found, please put it in .env file")
 
