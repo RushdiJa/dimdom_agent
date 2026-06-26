@@ -44,7 +44,7 @@ load_dotenv()
 
 api_key_num = 1 
 TOTAL_API_KEYS = int(os.environ.get("TOTAL_API_KEYS") or 1)
-MAX_ITERATIONS = 5 
+MAX_ITERATIONS = 20
 
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
@@ -93,7 +93,7 @@ def call_dimdom(use_tools : bool = True):
             )
             if response.usage_metadata is None: raise ConnectionError("meta data is null")
             # if meta_data is null
-            return response or None 
+            return response 
         except Exception as error:
             if args.verbose:
                 print(f"Api Key {api_key_num} failed")
@@ -112,6 +112,7 @@ def call_dimdom(use_tools : bool = True):
     
 
 def main():
+    os.makedirs("./AGENT_OUTPUT", exist_ok=True)
     prompt_token_count = 0 
     candidates_token_count = 0
     for iter in range(MAX_ITERATIONS):
