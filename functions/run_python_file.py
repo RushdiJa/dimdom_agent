@@ -1,4 +1,5 @@
 import os
+import sys
 import subprocess
 from functions.utilities.paths import is_safe_path
 from google.genai import types
@@ -12,7 +13,7 @@ def run_python_file(working_directory: str, file_path: str, args: list[str] | No
         if not full_path.endswith(".py"):
             return f'Error: "{file_path}" is not a Python file'
         # abc.py 2 
-        command = ["python", full_path]
+        command = [sys.executable, full_path]
         if args: command.extend(args)
         result = subprocess.run(command, capture_output=True, text=True, timeout=30)
         result_array = []
