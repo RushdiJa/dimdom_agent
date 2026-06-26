@@ -21,35 +21,47 @@ write_file.py          → Creates or modifies files
 run_python_file.py     → Executes Python scripts safely
 ```
 
-## Setup
+## Installation
+
+### Requirements
+- Python 3.14+
+- [uv](https://docs.astral.sh/uv/getting-started/installation/) package manager
 
 ### 1. Clone repository
-
-```bash id="repo1"
+```bash
 git clone https://github.com/RushdiJa/dimdom_agent.git
 cd dimdom_agent
 ```
 
-### 2. Create `.env` file
-
-```env id="env1"
-GEMINI_API_KEY1=YOUR_API_KEY_1
-GEMINI_API_KEY2=YOUR_API_KEY_2
-TOTAL_API_KEYS=2
+### 2. Install uv (if not installed)
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ### 3. Install dependencies
-
-```bash id="install1"
+```bash
 uv sync
 ```
 
-### 4. Run agent
+### 4. Create `.env` file
+```env
+GEMINI_API_KEY1=YOUR_API_KEY_HERE
+TOTAL_API_KEYS=1
+```
+> For multiple keys: add `GEMINI_API_KEY2`, `GEMINI_API_KEY3`... and update `TOTAL_API_KEYS`
 
-```bash id="run1"
-uv run main.py
+### 5. Create output directory
+```bash
+mkdir AGENT_OUTPUT
 ```
 
+### 6. Run
+```bash
+uv run main.py "your prompt here"
+
+# verbose mode
+uv run main.py "your prompt here" --verbose
+```
 ## How it works
 
 The agent uses Google Gemini function calling to decide when to:
