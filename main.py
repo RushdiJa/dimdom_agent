@@ -134,12 +134,10 @@ def main():
                 if args.verbose: 
                     print(f"-> {function_call_result.parts[0].function_response.response}")
                 list_functions_result.append(function_call_result.parts[0])
-                for fun in list_functions_result:
-                    try:
-                        messages.append(types.Content(role="function",
-                        parts=[types.Part.from_function_response(name=fun.function_response.name,response=fun.function_response.response)]))
-                    except:
-                        pass
+            for fun in list_functions_result:
+                messages.append(types.Content(role="tool",
+                    parts=[types.Part.from_function_response(name=fun.function_response.name,response=fun.function_response.response)]))
+                    
 
         else:
             if args.verbose:
