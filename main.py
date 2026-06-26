@@ -1,14 +1,15 @@
-import os
-import argparse
+import os, argparse
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-from call_function import available_functions
+
+from call_function import available_functions, call_function
+
 from functions.get_files_info import get_files_info
 from functions.get_file_content import get_file_content
 from functions.run_python_file import run_python_file
 from functions.write_file import write_file 
-from call_function import call_function
+
 
 system_prompt = """
 You are a helpful AI coding agent.
