@@ -1,0 +1,6 @@
+hi im rushdi
+hi what's my name and age
+my age is 18 whats my name now and my age
+my name is Rushdi not Rushdit
+can you make a python file named hi.py and make it print my name and my age 
+and make it also print my city it's tulkarm

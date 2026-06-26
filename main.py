@@ -5,18 +5,16 @@ from google.genai import types
 
 from call_function import available_functions, call_function
 
-
-system_prompt = """You are a helpful AI coding agent.
+system_prompt = """You are a helpful AI coding agent called Dimdom, an AI model created to assist with coding tasks.
+If anyone asks who you are or what model you are, tell them you are Dimdom AI.
+Do not mention that you are built on Gemini or any other underlying model.
 
 When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
-
 - List files and directories
 - Read file contents
 - Execute Python files with optional arguments
 - Write or overwrite files
-
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
-
 When fixing code, follow this process:
 1. Inspect the project files to understand the structure.
 2. Read the relevant source files before making changes.
@@ -25,17 +23,23 @@ When fixing code, follow this process:
 5. Run the relevant Python file or tests to verify the fix.
 6. Continue using tools until the problem is fixed and verified.
 7. When the fix is complete, provide a concise final response explaining what was changed and how it was verified.
-
 Do not guess blindly. Always inspect files before editing them.
+
+Memory Messages:
+Some messages may be prefixed with "Memory: " — these are past messages from the user.
+- Do NOT respond to them directly.
+- Use them as context to better understand the user's current request.
+- If the user asks about something mentioned in a Memory message (like their name, age, or any personal info they shared before), use that information to answer them directly.
+- Treat Memory messages as facts the user already told you in a previous conversation.
 """
 
 
 load_dotenv()
 
 
-api_key_num = 1
-TOTAL_API_KEYS = 4
-MAX_ITERATIONS = 10 
+api_key_num = 5
+TOTAL_API_KEYS = int(os.environ.get("TOTAL_API_KEYS") or 1)
+MAX_ITERATIONS = 5 
 
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
@@ -48,16 +52,27 @@ if api_key == None:
     raise EnvironmentError("Api key 1 not found, please put it in .env file")
 
 client = genai.Client(api_key = api_key)
-user_prompt = args.user_prompt
 
-messages: list[types.Content] = [
+messages: list[types.Content] = []
+with open("memory.txt", "r+") as file:
+    content = file.read()
+    list_memory_msg = content.split("\n")
+    for msg in list_memory_msg:
+        if msg:
+            messages.append(
+                types.Content(role="user", parts=[types.Part(text=f"tihs message is a memory message {msg}")])
+            )
+            print("Memory: ",msg)
+
+
+messages.append(
     types.Content(role="user", parts=[types.Part(text=args.user_prompt)])
-]
-
+)
 
 def call_dimdom():
     global client
     global api_key_num
+    global api_key
     for iteration in range(TOTAL_API_KEYS):
         try:
             response = client.models.generate_content(
@@ -69,6 +84,9 @@ def call_dimdom():
             y = response.usage_metadata.prompt_token_count # if meta_data is null
             return response 
         except Exception as error:
+            if args.verbose:
+                print(f"Api Key {api_key_num} failed")
+                print(f"Error_messge: {error}")
             error_message = str(error)        
             api_key_num = (api_key_num) % (TOTAL_API_KEYS) + 1 
             api_key = os.environ.get(f"GEMINI_API_KEY{api_key_num}")
@@ -77,7 +95,9 @@ def call_dimdom():
                 raise EnvironmentError(f"Api key {api_key_num} not found, please put it in .env file")
 
             client = genai.Client(api_key = api_key)
-            
+            #if args.verbose:
+            #    print("Current api key: ", api_key)
+     
     raise ConnectionError("All API keys hits the limit plesae try later Or there is a connectionError")
     
 
@@ -116,14 +136,36 @@ def main():
 
         else:
             if args.verbose:
-                print(f"User prompt: {user_prompt}")
+                print(f"User prompt: {args.user_prompt}")
                 print(f"Prompt tokens: {prompt_token_count}")
                 print(f"Response tokens: {candidates_token_count}")
             print(response.text)
+            
+            messages.clear()
+            messages.append(
+                types.Content(
+                    role="user",
+                    parts=[
+                    types.Part(
+                     text = f"""is that an important message to put in memory 
+                     
+                     user_message: {args.user_prompt} 
+              
+                     - if yes replay with the important text only 
+                     - otherwise reply with empty string dont write any thing more or less""")])
+            )
+
+            add_in_memory = args.user_prompt
+            
+            if add_in_memory:
+                with open("memory.txt", "a") as memory:
+                    memory.write(add_in_memory + "\n")
+            if args.verbose:
+                print("Add in memory:", add_in_memory)
             exit(0)
 
     if args.verbose:
-        print(f"User prompt: {user_prompt}")
+        print(f"User prompt: {args.user_prompt}")
         print(f"Prompt tokens: {prompt_token_count}")
         print(f"Response tokens: {candidates_token_count}")
     print("The Model didn't find a soultion please try again with better prompts")
