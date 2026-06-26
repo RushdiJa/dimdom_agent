@@ -15,6 +15,7 @@ When a user asks a question or makes a request, make a function call plan. You c
 - Execute Python files with optional arguments
 - Write or overwrite files
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
+
 When fixing code, follow this process:
 1. Inspect the project files to understand the structure.
 2. Read the relevant source files before making changes.
@@ -25,21 +26,24 @@ When fixing code, follow this process:
 7. When the fix is complete, provide a concise final response explaining what was changed and how it was verified.
 Do not guess blindly. Always inspect files before editing them.
 
+Running Python files:
+- When asked about the output of a file or the result of running code, always use run_python_file instead of reading and analyzing the code manually.
+- Python files that use input() cannot be run directly. If a file requires user input, modify it to accept arguments via sys.argv instead, then run it.
+- When writing or generating Python code that requires user input, always use sys.argv instead of input(). This allows the code to be executed directly with arguments.
+
 Memory Messages:
 Some messages may be prefixed with "Memory: " — these are past messages from the user.
 - Do NOT respond to them directly.
 - Use them as context to better understand the user's current request.
 - If the user asks about something mentioned in a Memory message (like their name, age, or any personal info they shared before), use that information to answer them directly.
 - Treat Memory messages as facts the user already told you in a previous conversation.
-"""
+""" 
 
-
-load_dotenv()
 
 
 api_key_num = 5
 TOTAL_API_KEYS = int(os.environ.get("TOTAL_API_KEYS") or 1)
-MAX_ITERATIONS = 5 
+MAX_ITERATIONS = 20 
 
 parser = argparse.ArgumentParser(description="Chatbot")
 parser.add_argument("user_prompt", type=str, help="User prompt")
@@ -60,10 +64,10 @@ with open("memory.txt", "r+") as file:
     for msg in list_memory_msg:
         if msg:
             messages.append(
-                types.Content(role="user", parts=[types.Part(text=f"tihs message is a memory message {msg}")])
+                types.Content(role="user", parts=[types.Part(text=f"Memory message: {msg}")])
             )
-            print("Memory: ",msg)
-
+            if args.verbose:
+                print(f"Memory: {msg}")
 
 messages.append(
     types.Content(role="user", parts=[types.Part(text=args.user_prompt)])
@@ -156,7 +160,7 @@ def main():
             )
 
             add_in_memory = args.user_prompt
-            
+             
             if add_in_memory:
                 with open("memory.txt", "a") as memory:
                     memory.write(add_in_memory + "\n")

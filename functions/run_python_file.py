@@ -2,7 +2,6 @@ import os
 import subprocess
 from functions.utilities.paths import is_safe_path
 from google.genai import types
-
 def run_python_file(working_directory: str, file_path: str, args: list[str] | None = None) -> str:
     try:
         if not is_safe_path(working_directory, file_path):
@@ -16,11 +15,10 @@ def run_python_file(working_directory: str, file_path: str, args: list[str] | No
         command = ["python", full_path]
         if args: command.extend(args)
         result = subprocess.run(command, capture_output=True, text=True, timeout=30)
-
         result_array = []
         if result.returncode != 0:
             result_array.append(f"Process exited with code {result.returncode}")
-        
+
         if (not result.stdout) and (not result.stderr):
             result_array.append("No output produced")
         else:
@@ -30,7 +28,6 @@ def run_python_file(working_directory: str, file_path: str, args: list[str] | No
     except Exception as e:
         return f"Error: executing Python file: {e}"
 
-    
 schema_run_python_file = types.FunctionDeclaration(
     name="run_python_file",
     description="run a python with a given args and returns the output",
@@ -47,10 +44,11 @@ schema_run_python_file = types.FunctionDeclaration(
                     type=types.Type.STRING
                 ),
                 description="args you want to gives the python file to take",
-
             ),
         },
         required=["file_path"]
     ),
 )
- 
+    
+
+

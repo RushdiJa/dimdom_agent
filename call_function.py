@@ -12,6 +12,8 @@ from functions.get_files_info import get_files_info
 from functions.write_file import write_file
 from functions.run_python_file import run_python_file
 
+
+
 function_map: dict[str, Callable[..., str]] = {
     "get_file_content": get_file_content,
     "run_python_file": run_python_file,
@@ -37,7 +39,7 @@ def call_function(function_call: types.FunctionCall, verbose: bool = False) -> t
                 response={"error": f"Unknown function: {function_name}"},)],)
     args = dict(function_call.args) if function_call.args else {}
 
-    args["working_directory"] = "./calculator"
+    args["working_directory"] = "./AGENT_OUTPUT"
     function_result = function_map[function_name](**args)
     return types.Content(
         role="tool",

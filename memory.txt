@@ -1,6 +1,11 @@
-hi im rushdi
-hi what's my name and age
-my age is 18 whats my name now and my age
-my name is Rushdi not Rushdit
-can you make a python file named hi.py and make it print my name and my age 
-and make it also print my city it's tulkarm
+hi im wassem and my gender is gay im single gay im from ramallah
+make a python file and let it print im gay
+i want it's name to be waseem
+make a c++ file to solve this problem make it's name a soultion.cpp the problem is the classical stair casee problem given an integer n you can either climp 1 step or 2 print number of ways if you start at 0 to reach n
+make another file solving same problem but in soultion.py
+make another file solving same problem but in soultion.py i deleted the c++ one because i want it in python
+i want the python code to take input from user in console please not n =5 
+what's the output when n=10
+what's the output when n=10
+what's the output when n = 10 in the solution.py
+what's the output when n = 10 in the solution.py
