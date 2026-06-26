@@ -78,6 +78,8 @@ def call_dimdom():
     global client
     global api_key_num
     global api_key
+    # 1 2 3 4 5
+    #  
     for iteration in range(TOTAL_API_KEYS):
         try:
             response = client.models.generate_content(
@@ -147,26 +149,51 @@ def main():
             print(response.text)
             
             messages.clear()
+            
+            memory = ""
+            with open("memory.txt", "r") as f:
+                memory = f.read()
+
             messages.append(
                 types.Content(
                     role="user",
                     parts=[
-                    types.Part(
-                     text = f"""is that an important message to put in memory 
-                     
-                     user_message: {args.user_prompt} 
-              
-                     - if yes replay with the important text only 
-                     - otherwise reply with empty string dont write any thing more or less""")])
+                        types.Part(
+                            text=f"""Here is the full memory from previous conversations, one entry per line:
+
+            {memory}
+            {args.user_prompt}
+
+            Please clean and reorganize this memory by:
+            1. Removing duplicate or redundant entries
+            2. Merging related facts about the same topic
+            3. Keeping only important and useful information
+            4. Return the result as clean lines, one fact per line, no extra formatting or explanations
+            """
+                        )
+                    ]
+                )
             )
 
-            add_in_memory = args.user_prompt
-             
-            if add_in_memory:
-                with open("memory.txt", "a") as memory:
-                    memory.write(add_in_memory + "\n")
+            global system_prompt
+            system_prompt = """You are a memory organizer assistant.
+            You will receive a list of memory entries from previous conversations with a user.
+            Your job is to:
+            - Remove duplicates and redundant entries
+            - Merge related facts into one clean line
+            - Keep only useful and important information
+            - Return ONLY the cleaned memory as plain text, one fact per line
+            - Do NOT add any explanation, preamble, or formatting
+            """
+
+            new_optmized_memory = call_dimdom().text
+
+            if new_optmized_memory:
+                os.remove("memory.txt")
+                with open("memory.txt", "w") as memory:
+                    memory.write(new_optmized_memory + "\n")
             if args.verbose:
-                print("Add in memory:", add_in_memory)
+                print("MEMORY: ",new_optmized_memory)
             exit(0)
 
     if args.verbose:
