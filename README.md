@@ -50,12 +50,7 @@ TOTAL_API_KEYS=1
 ```
 > For multiple keys: add `GEMINI_API_KEY2`, `GEMINI_API_KEY3`... and update `TOTAL_API_KEYS`
 
-### 5. Create output directory
-```bash
-mkdir AGENT_OUTPUT
-```
-
-### 6. Run
+### 5. Run
 ```bash
 uv run main.py "your prompt here"
 
